@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using ProbabilityCalculator.Functions;
@@ -22,17 +23,20 @@ public class ProbabilityCalculatorServiceTests
         Assert.Contains("FunctionB", result);
     }
     
-    [Fact]
-    public void Calculate_WithValidFunctionNameAndInputs_ReturnsCorrectResult()
+    [Theory]
+    [InlineData("FunctionA")]
+    [InlineData("FunctionB")]
+    [InlineData("FUNCTIONB")]
+    public void Calculate_WithValidFunctionNameAndInputs_ReturnsCorrectResult(string functionName)
     {
         // Arrange
         ProbabilityCalculatorService sut = CreateSut();
         
         // Act
-        var result = sut.Calculate("FunctionA", 0.5f, 0.5f);
+        var result = sut.Calculate(functionName, 0.5f, 0.5f);
         
         // Assert
-        Assert.Equal(0.5f, result.Result);
+        result.Result.Should().Be(0.5f);
     }
     
     [Fact]
@@ -71,7 +75,7 @@ public class ProbabilityCalculatorServiceTests
         functionA.Name.Returns("FunctionA");
         
         var functionB = Substitute.For<IProbabilityFunction>();
-        functionB.Calculate(Arg.Any<float>(), Arg.Any<float>()).Returns(1f);
+        functionB.Calculate(Arg.Any<float>(), Arg.Any<float>()).Returns(0.5f);
         functionB.Name.Returns("FunctionB");
 
         var functions = new List<IProbabilityFunction>

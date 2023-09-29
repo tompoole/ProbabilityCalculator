@@ -20,7 +20,7 @@ public class ProbabilityCalculatorService : IProbabilityCalculatorService
 
     public ProbabilityCalculatorResult Calculate(string functionName, float a, float b)
     {
-        var function = _functions.FirstOrDefault(x => x.Name == functionName);
+        var function = _functions.FirstOrDefault(x => string.Equals(x.Name, functionName, StringComparison.OrdinalIgnoreCase));
         if (function == null)
         {
             _logger.LogWarning("Specified function {FunctionName} could not be found.", functionName);

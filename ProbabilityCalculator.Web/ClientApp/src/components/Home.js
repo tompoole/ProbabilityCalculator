@@ -14,31 +14,26 @@ export default function Home() {
 
   useEffect(() => {
     fetchFunctions();
-  });
+  }, []);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     const formData = new FormData(e.target);
     const formObj = Object.fromEntries(formData);
     const request = `/api/functions/${formObj.function}?a=${formObj.a}&b=${formObj.b}`;
 
-    fetch(request)
-      .then(response => {
-          if (!response.ok) {
-            throw new Error("Something went wrong");
-          } 
-          
-          return response.json();
-      })
-      .then(json => { 
-        setResult(json);
-        setError(null);
-      })
-      .catch(e => {
-        setError(e.message);
-        setResult(null);
-      })
+    const response = await fetch(request);
+    const data = await response.json();
+
+    if (response.ok) {
+      setResult(data);
+      setError(null);
+    }
+    else {
+      setResult(null);
+      setError(data);
+    }
   }
 
   function renderResult(r) {
@@ -62,10 +57,10 @@ export default function Home() {
   }
 
   if (!functions.length) {
-    return (<div>Loading...</div>)
+    return (<div>Loading...</div>);
   }
 
-  const functionOptions = functions.map(f => <option value={f}>{f}</option>)
+  const functionOptions = functions.map(f => <option key={f} value={f}>{f}</option>)
   const resultCard = result ? renderResult(result) : null;
   const errorCard = error ? renderError(error) : null;
 
@@ -95,5 +90,5 @@ export default function Home() {
       {resultCard}
       {errorCard}
     </>
-    )
+    );
 }
